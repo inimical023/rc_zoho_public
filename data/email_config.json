@@ -1,0 +1,37 @@
+{
+  "smtp_server": "smtp.office365.com",
+  "smtp_port": 587,
+  "use_tls": true,
+  "sender_email": "integration@example.com",
+  "sender_name": "RC-Zoho Integration",
+  "recipients": [
+    {
+      "name": "Admin",
+      "email": "admin@example.com",
+      "receive_daily": true,
+      "receive_errors": true
+    },
+    {
+      "name": "Manager",
+      "email": "manager@example.com",
+      "receive_daily": true,
+      "receive_errors": false
+    }
+  ],
+  "report_settings": {
+    "send_empty_reports": false,
+    "include_raw_logs": false,
+    "include_charts": true,
+    "max_calls_in_detail": 50
+  },
+  "subject_templates": {
+    "accepted_calls": "RC-Zoho: Accepted Calls Report - {date}",
+    "missed_calls": "RC-Zoho: Missed Calls Report - {date}",
+    "combined": "RC-Zoho: Call Processing Report - {date}",
+    "error": "RC-Zoho: ERROR - Call Processing Failed - {date}"
+  },
+  "error_notification": {
+    "threshold": 3,
+    "include_stacktrace": true
+  }
+}

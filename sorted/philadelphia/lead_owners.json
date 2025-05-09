@@ -1,0 +1,58 @@
+{
+  "lead_owners": [
+    {
+      "id": "5678901234",
+      "name": "Sarah Reynolds",
+      "email": "sarah.reynolds@example.com",
+      "role": "Sales Manager",
+      "active": true,
+      "assignment_weight": 2.0
+    },
+    {
+      "id": "6789012345",
+      "name": "David Chen",
+      "email": "david.chen@example.com",
+      "role": "Senior Sales Representative",
+      "active": true,
+      "assignment_weight": 1.5
+    },
+    {
+      "id": "7890123456",
+      "name": "Priya Patel",
+      "email": "priya.patel@example.com",
+      "role": "Sales Representative",
+      "active": true,
+      "assignment_weight": 1.0
+    },
+    {
+      "id": "8901234567",
+      "name": "James Wilson",
+      "email": "james.wilson@example.com",
+      "role": "Sales Representative",
+      "active": true,
+      "assignment_weight": 1.0
+    },
+    {
+      "id": "9012345678",
+      "name": "Maria Rodriguez",
+      "email": "maria.rodriguez@example.com",
+      "role": "Sales Representative",
+      "active": true,
+      "assignment_weight": 1.0
+    }
+  ],
+  "assignment_rules": {
+    "round_robin": true,
+    "respect_weights": true,
+    "fallback_owner_id": "5678901234",
+    "office_hours_only": false,
+    "department_specific": {
+      "enabled": false,
+      "mappings": {}
+    }
+  },
+  "meta": {
+    "last_updated": "2025-05-09T10:00:00-04:00",
+    "total_active": 5
+  }
+}

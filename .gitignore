@@ -1,0 +1,50 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+ENV/
+.env/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Logs and databases
+*.log
+logs/
+*.db
+*.sqlite
+*.sqlite3
+
+# Credential files - NEVER commit these
+data/credentials.enc
+data/encryption.key
+
+# Environment-specific configurations
+.env
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Generated reports
+logs/reports/
+*.html
+
+# Raw logs that might contain sensitive information
+logs/**/raw_logs/
+
+# Project-specific
+**/temp/
+**/*.tmp

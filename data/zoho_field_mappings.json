@@ -1,0 +1,38 @@
+{
+  "accepted_calls": {
+    "Phone": "Phone",
+    "Email": "Email",
+    "First_Name": "First_Name",
+    "Last_Name": "Last_Name",
+    "Company": "Company",
+    "Lead_Status": "Lead_Status",
+    "Lead_Source": "Lead_Source",
+    "Lead_Owner": {
+      "id": "${lead_owner_id}"
+    },
+    "Description": "Description",
+    "City": "City",
+    "State": "State",
+    "Street": "Street",
+    "Zip_Code": "Zip_Code"
+  },
+  "missed_calls": {
+    "Phone": "Phone",
+    "First_Name": "First_Name",
+    "Last_Name": "Last_Name",
+    "Company": "Company",
+    "Lead_Status": "Lead_Status",
+    "Lead_Source": "Lead_Source",
+    "Lead_Owner": {
+      "id": "${lead_owner_id}"
+    }
+  },
+  "lead_status": {
+    "new": "New",
+    "accepted_call": "Accepted Call",
+    "missed_call": "Missed Call",
+    "missed_call_with_voicemail": "Missed Call with Voicemail",
+    "duplicate": "Duplicate"
+  },
+  "lead_source": "RingCentral Integration"
+}

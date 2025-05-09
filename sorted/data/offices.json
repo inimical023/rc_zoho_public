@@ -1,0 +1,102 @@
+{
+  "offices": {
+    "philadelphia": {
+      "name": "Philadelphia Office",
+      "processing_order": 1,
+      "timezone": "America/New_York",
+      "main_number": "+12155551000",
+      "address": {
+        "street": "123 Market St",
+        "city": "Philadelphia",
+        "state": "PA",
+        "zip": "19107"
+      },
+      "email_report": {
+        "recipients": [
+          "philly-manager@example.com"
+        ]
+      }
+    },
+    "pittsburgh": {
+      "name": "Pittsburgh Office",
+      "processing_order": 2,
+      "timezone": "America/New_York",
+      "main_number": "+14125552000",
+      "address": {
+        "street": "456 Forbes Ave",
+        "city": "Pittsburgh",
+        "state": "PA",
+        "zip": "15219"
+      },
+      "email_report": {
+        "recipients": [
+          "pitt-manager@example.com"
+        ]
+      }
+    },
+    "allentown": {
+      "name": "Allentown Office",
+      "processing_order": 3,
+      "timezone": "America/New_York",
+      "main_number": "+16105553000",
+      "address": {
+        "street": "789 Hamilton St",
+        "city": "Allentown",
+        "state": "PA",
+        "zip": "18101"
+      },
+      "email_report": {
+        "recipients": [
+          "allentown-manager@example.com"
+        ]
+      }
+    },
+    "reading": {
+      "name": "Reading Office",
+      "processing_order": 4,
+      "timezone": "America/New_York",
+      "main_number": "+16105554000",
+      "address": {
+        "street": "321 Penn St",
+        "city": "Reading",
+        "state": "PA",
+        "zip": "19601"
+      },
+      "email_report": {
+        "recipients": [
+          "reading-manager@example.com"
+        ]
+      }
+    },
+    "broad": {
+      "name": "Broad Street Office",
+      "processing_order": 5,
+      "timezone": "America/New_York",
+      "main_number": "+12155555000",
+      "address": {
+        "street": "1500 N Broad St",
+        "city": "Philadelphia",
+        "state": "PA",
+        "zip": "19121"
+      },
+      "email_report": {
+        "recipients": [
+          "broad-manager@example.com"
+        ]
+      }
+    }
+  },
+  "global_config": {
+    "default_timezone": "America/New_York",
+    "email_report": {
+      "recipients": [
+        "admin@example.com"
+      ]
+    },
+    "processing": {
+      "default_hours_back": 24,
+      "max_hours_back": 168,
+      "parallel_processing": false
+    }
+  }
+}

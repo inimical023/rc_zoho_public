@@ -1,0 +1,80 @@
+{
+  "extensions": [
+    {
+      "id": "101",
+      "name": "Reception",
+      "type": "Department",
+      "number": "1001",
+      "site": "Philadelphia",
+      "process_calls": true
+    },
+    {
+      "id": "102",
+      "name": "Sales Department",
+      "type": "Department",
+      "number": "1002",
+      "site": "Philadelphia",
+      "process_calls": true
+    },
+    {
+      "id": "103",
+      "name": "Support Department",
+      "type": "Department",
+      "number": "1003",
+      "site": "Philadelphia",
+      "process_calls": true
+    },
+    {
+      "id": "201",
+      "name": "John Smith",
+      "type": "User",
+      "number": "2001",
+      "email": "john.smith@example.com",
+      "site": "Philadelphia",
+      "department": "Sales",
+      "process_calls": true
+    },
+    {
+      "id": "202",
+      "name": "Jane Doe",
+      "type": "User",
+      "number": "2002",
+      "email": "jane.doe@example.com",
+      "site": "Philadelphia",
+      "department": "Sales",
+      "process_calls": true
+    },
+    {
+      "id": "203",
+      "name": "Mike Johnson",
+      "type": "User",
+      "number": "2003",
+      "email": "mike.johnson@example.com",
+      "site": "Philadelphia",
+      "department": "Support",
+      "process_calls": true
+    },
+    {
+      "id": "204",
+      "name": "Sarah Williams",
+      "type": "User",
+      "number": "2004",
+      "email": "sarah.williams@example.com",
+      "site": "Philadelphia",
+      "department": "Support",
+      "process_calls": true
+    },
+    {
+      "id": "301",
+      "name": "Conference Room A",
+      "type": "Room",
+      "number": "3001",
+      "site": "Philadelphia",
+      "process_calls": false
+    }
+  ],
+  "meta": {
+    "last_updated": "2025-05-09T10:00:00-04:00",
+    "total": 8
+  }
+}
