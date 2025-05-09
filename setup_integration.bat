@@ -136,36 +136,42 @@ if %errorlevel% neq 0 (
     echo Using PowerShell to download repository as ZIP file...
     mkdir temp_repo 2>nul
     
-    :: Create and run a PowerShell script for downloading
-    echo [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; > download_repo.ps1
-    echo try { >> download_repo.ps1
-    echo   Invoke-WebRequest -Uri 'https://github.com/inimical023/rc_zoho_public/archive/refs/heads/master.zip' -OutFile 'repo.zip' >> download_repo.ps1
-    echo   Write-Host "Download successful" >> download_repo.ps1
-    echo } catch { >> download_repo.ps1
-    echo   Write-Host "Error: $_" >> download_repo.ps1
-    echo   exit 1 >> download_repo.ps1
-    echo } >> download_repo.ps1
-    
-    powershell -ExecutionPolicy Bypass -File download_repo.ps1
+    :: Use direct PowerShell command instead of script file
+    powershell -ExecutionPolicy Bypass -Command "& {[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; try { Invoke-WebRequest -Uri 'https://github.com/inimical023/rc_zoho_public/archive/refs/heads/master.zip' -OutFile 'repo.zip'; Write-Host 'Download successful' } catch { Write-Host ('Error: ' + $_.Exception.Message); exit 1 }}"
     if %errorlevel% neq 0 (
         echo [ERROR] Failed to download repository using PowerShell.
         echo Please check your internet connection or download manually from:
         echo https://github.com/inimical023/rc_zoho_public
-        pause
-        exit /b 1
+        
+        :: Try alternative direct method as last resort
+        echo Attempting direct PowerShell web client download as last resort...
+        powershell -ExecutionPolicy Bypass -Command "$client = New-Object System.Net.WebClient; $client.DownloadFile('https://github.com/inimical023/rc_zoho_public/archive/refs/heads/master.zip', 'repo.zip')"
+        if %errorlevel% neq 0 (
+            echo [ERROR] All download attempts failed.
+            pause
+            exit /b 1
+        ) else {
+            echo Direct download successful.
+        }
     )
-    del download_repo.ps1
     
     :: Extract ZIP file if available
     if exist repo.zip (
         echo Extracting repository files...
-        powershell -Command "& {Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory('repo.zip', 'temp_extract')}"
+        powershell -ExecutionPolicy Bypass -Command "& {try { Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory('repo.zip', 'temp_extract'); Write-Host 'Extraction successful' } catch { Write-Host ('Error extracting: ' + $_.Exception.Message); exit 1 }}"
         if %errorlevel% neq 0 (
-            echo [ERROR] Failed to extract ZIP file.
-            echo Please download and extract manually from:
-            echo https://github.com/inimical023/rc_zoho_public
-            pause
-            exit /b 1
+            :: Try alternative extraction method
+            echo [WARNING] PowerShell extraction failed, trying alternative extraction...
+            mkdir temp_extract 2>nul
+            powershell -ExecutionPolicy Bypass -Command "Expand-Archive -Path repo.zip -DestinationPath temp_extract -Force"
+            if %errorlevel% neq 0 (
+                echo [ERROR] All extraction attempts failed.
+                echo Please download and extract manually from:
+                echo https://github.com/inimical023/rc_zoho_public
+                pause
+                exit /b 1
+            )
+            echo Alternative extraction method succeeded.
         )
         
         echo Moving files from ZIP extract...
