@@ -98,12 +98,62 @@ if exist requirements.txt (
     )
 )
 
-:: Try to Clone repository using Git if available
+:: Try to Clone repository using Git or install if not available
 echo.
-echo Attempting to download files from GitHub repository...
+echo Checking Git installation...
 git --version > nul 2>&1
 if %errorlevel% neq 0 (
-    echo [INFO] Git is not installed. Falling back to direct download...
+    echo [INFO] Git is not installed. Attempting to install Git...
+    
+    :: Check for chocolatey package manager
+    where choco > nul 2>&1
+    if %errorlevel% equ 0 (
+        echo Chocolatey found, installing Git using Chocolatey...
+        choco install git -y
+        if %errorlevel% equ 0 (
+            echo Git installed successfully using Chocolatey.
+            :: Update PATH to include Git without needing to restart
+            for /f "tokens=*" %%a in ('where choco') do set CHOCO_PATH=%%a
+            set CHOCO_DIR=%CHOCO_PATH:\choco.exe=%
+            set GIT_DIR=%CHOCO_DIR%\..\lib\git\tools\bin
+            set PATH=%PATH%;%GIT_DIR%
+            echo Git should now be available in PATH.
+            goto CheckGitAgain
+        ) else (
+            echo [WARNING] Failed to install Git using Chocolatey.
+        )
+    ) else (
+        echo Chocolatey not found. Attempting direct Git download and install...
+        
+        :: Using PowerShell to download Git installer
+        echo Downloading Git installer...
+        mkdir temp_git_install 2>nul
+        powershell -ExecutionPolicy Bypass -Command ^
+          "try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; $client = New-Object System.Net.WebClient; $client.DownloadFile('https://github.com/git-for-windows/git/releases/download/v2.43.0.windows.1/Git-2.43.0-64-bit.exe', 'temp_git_install\GitInstaller.exe'); exit 0 } catch { Write-Error $_.Exception.Message; exit 1 }"
+        
+        if %errorlevel% neq 0 (
+            echo [WARNING] Failed to download Git installer.
+        ) else (
+            echo Running Git installer in silent mode...
+            temp_git_install\GitInstaller.exe /VERYSILENT /NORESTART /NOCANCEL /SP- /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS
+            if %errorlevel% equ 0 (
+                echo Git installation initiated. Adding Git to PATH...
+                :: Update PATH to include Git without needing to restart
+                set PATH=%PATH%;C:\Program Files\Git\cmd
+                echo Git should now be available in PATH.
+                timeout /t 5 /nobreak > nul
+                rmdir /S /Q temp_git_install
+            ) else (
+                echo [WARNING] Git installation has issues. Continuing with fallback methods...
+            )
+        )
+    )
+        
+    :CheckGitAgain
+    :: Check if Git is now installed
+    git --version > nul 2>&1
+    if %errorlevel% neq 0 (
+        echo [INFO] Git still not available. Falling back to direct download...
     
     :: Test for PowerShell availability directly
     echo Testing PowerShell availability...

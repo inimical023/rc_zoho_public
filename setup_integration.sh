@@ -94,11 +94,42 @@ else
     fi
 fi
 
-# Attempt to clone repository using Git if available, otherwise use curl/wget
+# Attempt to install Git if not available, or use existing Git installation
 echo ""
-echo "Attempting to download files from GitHub repository..."
+echo "Checking Git installation..."
 if ! git --version &> /dev/null; then
-    echo "[INFO] Git is not installed. Falling back to direct download..."
+    echo "[INFO] Git is not installed. Attempting to install Git..."
+
+    # Detect the Linux distribution and package manager
+    if command -v apt-get &> /dev/null; then
+        echo "Debian/Ubuntu detected, using apt-get to install Git..."
+        sudo apt-get update
+        sudo apt-get install -y git
+    elif command -v dnf &> /dev/null; then
+        echo "Fedora/RHEL detected, using dnf to install Git..."
+        sudo dnf install -y git
+    elif command -v yum &> /dev/null; then
+        echo "CentOS/RHEL detected, using yum to install Git..."
+        sudo yum install -y git
+    elif command -v pacman &> /dev/null; then
+        echo "Arch Linux detected, using pacman to install Git..."
+        sudo pacman -Sy --noconfirm git
+    elif command -v zypper &> /dev/null; then
+        echo "openSUSE detected, using zypper to install Git..."
+        sudo zypper install -y git
+    elif command -v apk &> /dev/null; then
+        echo "Alpine Linux detected, using apk to install Git..."
+        sudo apk add git
+    else
+        echo "[WARNING] Could not detect package manager to install Git automatically."
+        echo "Please install Git manually using your distribution's package manager."
+    fi
+
+    # Check if Git was installed successfully
+    if git --version &> /dev/null; then
+        echo "Git was installed successfully!"
+    else
+        echo "[INFO] Git still not available. Falling back to direct download..."
     
     # Check for curl or wget
     if command -v curl &> /dev/null; then
