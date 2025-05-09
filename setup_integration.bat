@@ -113,10 +113,7 @@ if %errorlevel% neq 0 (
         if %errorlevel% equ 0 (
             echo Git installed successfully using Chocolatey.
             :: Update PATH to include Git without needing to restart
-            for /f "tokens=*" %%a in ('where choco') do set CHOCO_PATH=%%a
-            set CHOCO_DIR=%CHOCO_PATH:\choco.exe=%
-            set GIT_DIR=%CHOCO_DIR%\..\lib\git\tools\bin
-            set PATH=%PATH%;%GIT_DIR%
+            set PATH=%PATH%;C:\Program Files\Git\cmd
             echo Git should now be available in PATH.
             goto CheckGitAgain
         ) else (
