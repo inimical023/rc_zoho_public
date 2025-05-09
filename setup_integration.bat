@@ -105,10 +105,28 @@ git --version > nul 2>&1
 if %errorlevel% neq 0 (
     echo [INFO] Git is not installed. Falling back to direct download...
     
-    :: Fallback to PowerShell for downloading ZIP
-    where powershell > nul 2>&1
-    if %errorlevel% neq 0 (
-        echo [ERROR] Neither Git nor PowerShell is available.
+    :: Test for PowerShell availability directly
+    echo Testing PowerShell availability...
+    
+    mkdir temp_dir 2>nul
+    powershell -Command "Write-Host 'PowerShell is available'" > temp_dir\ps_test.txt 2>&1
+    if not exist temp_dir\ps_test.txt (
+        echo [ERROR] PowerShell test file creation failed.
+    )
+    
+    set PS_AVAILABLE=0
+    findstr /C:"PowerShell is available" temp_dir\ps_test.txt > nul 2>&1
+    if %errorlevel% equ 0 (
+        set PS_AVAILABLE=1
+        echo PowerShell is available and working.
+    ) else (
+        echo [WARNING] PowerShell may be installed but not working properly.
+        type temp_dir\ps_test.txt
+    )
+    rmdir /S /Q temp_dir 2>nul
+    
+    if %PS_AVAILABLE% equ 0 (
+        echo [ERROR] Cannot use PowerShell for download. Please install Git or download manually.
         echo Please install Git from https://git-scm.com/downloads
         echo or download the files manually from https://github.com/inimical023/rc_zoho_public
         pause
@@ -116,18 +134,30 @@ if %errorlevel% neq 0 (
     )
     
     echo Using PowerShell to download repository as ZIP file...
-    powershell -Command "& {[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri 'https://github.com/inimical023/rc_zoho_public/archive/refs/heads/master.zip' -OutFile 'repo.zip'}"
+    mkdir temp_repo 2>nul
+    
+    :: Create and run a PowerShell script for downloading
+    echo [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; > download_repo.ps1
+    echo try { >> download_repo.ps1
+    echo   Invoke-WebRequest -Uri 'https://github.com/inimical023/rc_zoho_public/archive/refs/heads/master.zip' -OutFile 'repo.zip' >> download_repo.ps1
+    echo   Write-Host "Download successful" >> download_repo.ps1
+    echo } catch { >> download_repo.ps1
+    echo   Write-Host "Error: $_" >> download_repo.ps1
+    echo   exit 1 >> download_repo.ps1
+    echo } >> download_repo.ps1
+    
+    powershell -ExecutionPolicy Bypass -File download_repo.ps1
     if %errorlevel% neq 0 (
-        echo [ERROR] Failed to download repository.
+        echo [ERROR] Failed to download repository using PowerShell.
         echo Please check your internet connection or download manually from:
         echo https://github.com/inimical023/rc_zoho_public
         pause
         exit /b 1
     )
+    del download_repo.ps1
     
     :: Extract ZIP file if available
-    where powershell > nul 2>&1
-    if %errorlevel% equ 0 (
+    if exist repo.zip (
         echo Extracting repository files...
         powershell -Command "& {Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory('repo.zip', 'temp_extract')}"
         if %errorlevel% neq 0 (
