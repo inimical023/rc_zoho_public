@@ -150,9 +150,9 @@ if %errorlevel% neq 0 (
             echo [ERROR] All download attempts failed.
             pause
             exit /b 1
-        ) else {
+        ) else (
             echo Direct download successful.
-        }
+        )
     )
     
     :: Extract ZIP file if available
