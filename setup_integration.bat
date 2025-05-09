@@ -145,7 +145,8 @@ if %errorlevel% neq 0 (
         
         :: Try alternative direct method as last resort
         echo Attempting direct PowerShell web client download as last resort...
-        powershell -ExecutionPolicy Bypass -Command "$client = New-Object System.Net.WebClient; $client.DownloadFile('https://github.com/inimical023/rc_zoho_public/archive/refs/heads/master.zip', 'repo.zip')"
+        powershell -ExecutionPolicy Bypass -Command ^
+          "try { $client = New-Object System.Net.WebClient; $client.DownloadFile('https://github.com/inimical023/rc_zoho_public/archive/refs/heads/master.zip', 'repo.zip'); exit 0 } catch { Write-Error $_.Exception.Message; exit 1 }"
         if %errorlevel% neq 0 (
             echo [ERROR] All download attempts failed.
             pause
