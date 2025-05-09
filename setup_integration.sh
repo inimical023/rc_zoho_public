@@ -52,34 +52,124 @@ if [ ! -d "core/venv" ]; then
     fi
 fi
 
+# Requirements file
+echo ""
+echo "Creating requirements.txt..."
+cat > requirements.txt << EOF
+cryptography==41.0.1
+python-dateutil==2.8.2
+pytz==2023.3
+requests==2.31.0
+ttkbootstrap==1.10.1
+tkcalendar==1.6.1
+phonenumbers==8.13.11
+beautifulsoup4==4.12.2
+matplotlib==3.7.1
+Pillow==10.0.0
+requests-file==1.5.1
+EOF
+
 # Activate virtual environment and install dependencies
 echo ""
 echo "Installing required packages..."
 source core/venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-if [ $? -ne 0 ]; then
-    echo "WARNING: Failed to install some dependencies."
-    echo "You may need to install them manually."
-    echo "See requirements.txt for the list of required packages."
-fi
 
-# Clone the repository from GitHub
 echo ""
-echo "Cloning files from GitHub repository..."
-if ! git --version &> /dev/null; then
-    echo "ERROR: Git is not installed or not in PATH."
-    echo "Please install Git using your package manager:"
-    echo "  - For Ubuntu/Debian: sudo apt install git"
-    echo "  - For Fedora/CentOS/RHEL: sudo dnf install git"
-    exit 1
+echo "Installing dependencies from requirements.txt..."
+if [ -f requirements.txt ]; then
+    python -m pip install -r requirements.txt
+    if [ $? -ne 0 ]; then
+        echo "[ERROR] Failed to install some package dependencies."
+        echo "Please check the error messages above to identify the specific packages."
+        echo "You may need to install them manually or resolve the issues."
+    fi
+else
+    echo "[WARNING] requirements.txt not found."
+    echo "Creating base requirements file..."
+    python -m pip install cryptography python-dateutil pytz requests ttkbootstrap tkcalendar phonenumbers beautifulsoup4 matplotlib pillow requests-file
+    if [ $? -ne 0 ]; then
+        echo "[ERROR] Failed to install some basic dependencies."
+        echo "Please check the error messages above to identify the specific packages."
+    fi
 fi
 
-git clone https://github.com/inimical023/rc_zoho_public.git temp_repo
-if [ $? -ne 0 ]; then
-    echo "ERROR: Failed to clone repository."
-    echo "Please check your internet connection and try again."
-    exit 1
+# Attempt to clone repository using Git if available, otherwise use curl/wget
+echo ""
+echo "Attempting to download files from GitHub repository..."
+if ! git --version &> /dev/null; then
+    echo "[INFO] Git is not installed. Falling back to direct download..."
+    
+    # Check for curl or wget
+    if command -v curl &> /dev/null; then
+        echo "Using curl to download repository as ZIP file..."
+        mkdir -p temp_extract
+        curl -L https://github.com/inimical023/rc_zoho_public/archive/refs/heads/master.zip -o repo.zip
+        if [ $? -ne 0 ]; then
+            echo "[ERROR] Failed to download repository with curl."
+            echo "Please check your internet connection or download manually from:"
+            echo "https://github.com/inimical023/rc_zoho_public"
+            exit 1
+        fi
+    elif command -v wget &> /dev/null; then
+        echo "Using wget to download repository as ZIP file..."
+        mkdir -p temp_extract
+        wget https://github.com/inimical023/rc_zoho_public/archive/refs/heads/master.zip -O repo.zip
+        if [ $? -ne 0 ]; then
+            echo "[ERROR] Failed to download repository with wget."
+            echo "Please check your internet connection or download manually from:"
+            echo "https://github.com/inimical023/rc_zoho_public"
+            exit 1
+        fi
+    else
+        echo "[ERROR] Neither Git, curl, nor wget is available."
+        echo "Please install Git using your package manager:"
+        echo "  - For Ubuntu/Debian: sudo apt install git"
+        echo "  - For Fedora/CentOS/RHEL: sudo dnf install git"
+        echo "Or download the files manually from: https://github.com/inimical023/rc_zoho_public"
+        exit 1
+    fi
+    
+    # Extract ZIP file
+    if [ -f repo.zip ]; then
+        echo "Extracting repository files..."
+        if command -v unzip &> /dev/null; then
+            unzip -q repo.zip -d temp_extract
+            if [ $? -ne 0 ]; then
+                echo "[ERROR] Failed to extract ZIP file."
+                echo "Please install unzip or download and extract manually from:"
+                echo "https://github.com/inimical023/rc_zoho_public"
+                exit 1
+            fi
+            
+            mkdir -p temp_repo
+            echo "Moving files from ZIP extract..."
+            cp -r temp_extract/rc_zoho_public-master/* temp_repo/
+            if [ $? -ne 0 ]; then
+                echo "[ERROR] Failed to copy extracted files."
+                exit 1
+            fi
+            
+            # Clean up extraction directory
+            rm -rf temp_extract
+            rm repo.zip
+        else
+            echo "[ERROR] unzip command not available to extract the downloaded file."
+            echo "Please install unzip using your package manager:"
+            echo "  - For Ubuntu/Debian: sudo apt install unzip"
+            echo "  - For Fedora/CentOS/RHEL: sudo dnf install unzip"
+            exit 1
+        fi
+    fi
+else
+    echo "Git is installed, cloning repository..."
+    git clone https://github.com/inimical023/rc_zoho_public.git temp_repo
+    if [ $? -ne 0 ]; then
+        echo "[ERROR] Failed to clone repository with Git."
+        echo "Please check your internet connection and try again."
+        exit 1
+    fi
+    echo "Repository cloned successfully."
 fi
 
 # Copy files from the cloned repository
@@ -168,21 +258,6 @@ python unified_admin.py "\$@"
 EOF
 chmod +x launch_admin.sh
 
-# Requirements file
-echo ""
-echo "Creating requirements.txt..."
-cat > requirements.txt << EOF
-cryptography==41.0.1
-python-dateutil==2.8.2
-pytz==2023.3
-requests==2.31.0
-ttkbootstrap==1.10.1
-tkcalendar==1.6.1
-phonenumbers==8.13.11
-beautifulsoup4==4.12.2
-matplotlib==3.7.1
-Pillow==10.0.0
-EOF
 
 # Final steps
 echo ""

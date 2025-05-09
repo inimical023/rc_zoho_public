@@ -58,36 +58,108 @@ if not exist core\venv (
     )
 )
 
+:: Requirements file
+echo.
+echo Creating requirements.txt...
+echo cryptography==41.0.1 > requirements.txt
+echo python-dateutil==2.8.2 >> requirements.txt
+echo pytz==2023.3 >> requirements.txt
+echo requests==2.31.0 >> requirements.txt
+echo ttkbootstrap==1.10.1 >> requirements.txt
+echo tkcalendar==1.6.1 >> requirements.txt
+echo phonenumbers==8.13.11 >> requirements.txt
+echo beautifulsoup4==4.12.2 >> requirements.txt
+echo matplotlib==3.7.1 >> requirements.txt
+echo Pillow==10.0.0 >> requirements.txt
+echo requests-file==1.5.1 >> requirements.txt
+
 :: Activate virtual environment and install dependencies
 echo.
 echo Installing required packages...
 call core\venv\Scripts\activate.bat
 python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-if %errorlevel% neq 0 (
-    echo WARNING: Failed to install some dependencies.
-    echo You may need to install them manually.
-    echo See requirements.txt for the list of required packages.
+
+echo.
+echo Installing dependencies from requirements.txt...
+if exist requirements.txt (
+    python -m pip install -r requirements.txt
+    if %errorlevel% neq 0 (
+        echo [ERROR] Failed to install some package dependencies.
+        echo Please check the error messages above to identify the specific packages.
+        echo You may need to install them manually or resolve the issues.
+    )
+) else (
+    echo [WARNING] requirements.txt not found.
+    echo Creating base requirements file...
+    python -m pip install cryptography python-dateutil pytz requests ttkbootstrap tkcalendar phonenumbers beautifulsoup4 matplotlib pillow requests-file
+    if %errorlevel% neq 0 (
+        echo [ERROR] Failed to install some basic dependencies.
+        echo Please check the error messages above to identify the specific packages.
+    )
 )
 
-:: Clone the repository from GitHub
+:: Try to Clone repository using Git if available
 echo.
-echo Cloning files from GitHub repository...
+echo Attempting to download files from GitHub repository...
 git --version > nul 2>&1
 if %errorlevel% neq 0 (
-    echo ERROR: Git is not installed or not in PATH.
-    echo Please install Git from https://git-scm.com/downloads
-    echo and make sure it's added to your PATH.
-    pause
-    exit /b 1
-)
-
-git clone https://github.com/inimical023/rc_zoho_public.git temp_repo
-if %errorlevel% neq 0 (
-    echo ERROR: Failed to clone repository.
-    echo Please check your internet connection and try again.
-    pause
-    exit /b 1
+    echo [INFO] Git is not installed. Falling back to direct download...
+    
+    :: Fallback to PowerShell for downloading ZIP
+    where powershell > nul 2>&1
+    if %errorlevel% neq 0 (
+        echo [ERROR] Neither Git nor PowerShell is available.
+        echo Please install Git from https://git-scm.com/downloads
+        echo or download the files manually from https://github.com/inimical023/rc_zoho_public
+        pause
+        exit /b 1
+    )
+    
+    echo Using PowerShell to download repository as ZIP file...
+    powershell -Command "& {[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri 'https://github.com/inimical023/rc_zoho_public/archive/refs/heads/master.zip' -OutFile 'repo.zip'}"
+    if %errorlevel% neq 0 (
+        echo [ERROR] Failed to download repository.
+        echo Please check your internet connection or download manually from:
+        echo https://github.com/inimical023/rc_zoho_public
+        pause
+        exit /b 1
+    )
+    
+    :: Extract ZIP file if available
+    where powershell > nul 2>&1
+    if %errorlevel% equ 0 (
+        echo Extracting repository files...
+        powershell -Command "& {Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory('repo.zip', 'temp_extract')}"
+        if %errorlevel% neq 0 (
+            echo [ERROR] Failed to extract ZIP file.
+            echo Please download and extract manually from:
+            echo https://github.com/inimical023/rc_zoho_public
+            pause
+            exit /b 1
+        )
+        
+        echo Moving files from ZIP extract...
+        xcopy /E /Y temp_extract\rc_zoho_public-master\* temp_repo\
+        if %errorlevel% neq 0 (
+            echo [ERROR] Failed to copy extracted files.
+            pause
+            exit /b 1
+        )
+        
+        :: Clean up extraction directory
+        rmdir /S /Q temp_extract
+        del repo.zip
+    )
+) else (
+    echo Git is installed, cloning repository...
+    git clone https://github.com/inimical023/rc_zoho_public.git temp_repo
+    if %errorlevel% neq 0 (
+        echo [ERROR] Failed to clone repository with Git.
+        echo Please check your internet connection and try again.
+        pause
+        exit /b 1
+    )
+    echo Repository cloned successfully.
 )
 
 :: Copy files from the cloned repository
@@ -162,19 +234,6 @@ echo call core\venv\Scripts\activate.bat >> launch_admin.bat
 echo cd core >> launch_admin.bat
 echo python unified_admin.py %* >> launch_admin.bat
 
-:: Requirements file
-echo.
-echo Creating requirements.txt...
-echo cryptography==41.0.1 > requirements.txt
-echo python-dateutil==2.8.2 >> requirements.txt
-echo pytz==2023.3 >> requirements.txt
-echo requests==2.31.0 >> requirements.txt
-echo ttkbootstrap==1.10.1 >> requirements.txt
-echo tkcalendar==1.6.1 >> requirements.txt
-echo phonenumbers==8.13.11 >> requirements.txt
-echo beautifulsoup4==4.12.2 >> requirements.txt
-echo matplotlib==3.7.1 >> requirements.txt
-echo Pillow==10.0.0 >> requirements.txt
 
 :: Final steps
 echo.
