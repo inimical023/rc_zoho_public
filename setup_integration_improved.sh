@@ -64,24 +64,45 @@ if [ $? -ne 0 ]; then
     echo "See requirements.txt for the list of required packages."
 fi
 
-# Copy base Python files
+# Clone the repository from GitHub
+echo ""
+echo "Cloning files from GitHub repository..."
+if ! git --version &> /dev/null; then
+    echo "ERROR: Git is not installed or not in PATH."
+    echo "Please install Git using your package manager:"
+    echo "  - For Ubuntu/Debian: sudo apt install git"
+    echo "  - For Fedora/CentOS/RHEL: sudo dnf install git"
+    exit 1
+fi
+
+git clone https://github.com/inimical023/rc_zoho_public.git temp_repo
+if [ $? -ne 0 ]; then
+    echo "ERROR: Failed to clone repository."
+    echo "Please check your internet connection and try again."
+    exit 1
+fi
+
+# Copy files from the cloned repository
 echo ""
 echo "Setting up core files..."
-cp -v *.py core/
-cp -v README.md .
+cp -v temp_repo/*.py core/
+cp -v temp_repo/README.md .
 
 # Copy configuration files
 echo ""
 echo "Setting up configuration files..."
-cp -v data/*.json core/data/
+cp -v temp_repo/data/*.json core/data/
 mkdir -p core/sorted/data
-cp -v sorted/data/*.json core/sorted/data/
+cp -v temp_repo/sorted/data/*.json core/sorted/data/
 
 # Set up Philadelphia office files
 echo ""
 echo "Setting up Philadelphia office configuration..."
 mkdir -p core/sorted/philadelphia
-cp -v sorted/philadelphia/*.json core/sorted/philadelphia/
+cp -v temp_repo/sorted/philadelphia/*.json core/sorted/philadelphia/
+
+# Clean up temporary repository
+rm -rf temp_repo
 
 # Create PYTHONPATH file to help imports work
 echo ""

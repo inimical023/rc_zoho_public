@@ -70,24 +70,47 @@ if %errorlevel% neq 0 (
     echo See requirements.txt for the list of required packages.
 )
 
-:: Copy base Python files from our created templates
+:: Clone the repository from GitHub
+echo.
+echo Cloning files from GitHub repository...
+git --version > nul 2>&1
+if %errorlevel% neq 0 (
+    echo ERROR: Git is not installed or not in PATH.
+    echo Please install Git from https://git-scm.com/downloads
+    echo and make sure it's added to your PATH.
+    pause
+    exit /b 1
+)
+
+git clone https://github.com/inimical023/rc_zoho_public.git temp_repo
+if %errorlevel% neq 0 (
+    echo ERROR: Failed to clone repository.
+    echo Please check your internet connection and try again.
+    pause
+    exit /b 1
+)
+
+:: Copy files from the cloned repository
 echo.
 echo Setting up core files...
-copy /Y @setup_integration_files\*.py core\
-copy /Y @setup_integration_files\README.md .
+copy /Y temp_repo\*.py core\
+copy /Y temp_repo\README.md .
 
 :: Copy configuration files
 echo.
 echo Setting up configuration files...
-copy /Y @setup_integration_files\data\*.json core\data\
+copy /Y temp_repo\data\*.json core\data\
 mkdir core\sorted\data 2>nul
-copy /Y @setup_integration_files\sorted\data\*.json core\sorted\data\
+copy /Y temp_repo\sorted\data\*.json core\sorted\data\
 
 :: Set up Philadelphia office files
 echo.
 echo Setting up Philadelphia office configuration...
 mkdir core\sorted\philadelphia 2>nul
-copy /Y @setup_integration_files\sorted\philadelphia\*.json core\sorted\philadelphia\
+copy /Y temp_repo\sorted\philadelphia\*.json core\sorted\philadelphia\
+
+:: Clean up temporary repository
+rmdir /S /Q temp_repo
 
 :: Create PYTHONPATH file to help imports work
 echo.
